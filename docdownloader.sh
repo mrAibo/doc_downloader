@@ -612,13 +612,25 @@ process_file() {
     # -mx0: keine Kompression (nur Archivierung)
     # -mmt: Multithreading mit maximaler Anzahl Threads
     # -ms=off: Solid-Modus aus für schnellere Kompression
-    7z a -mx0 -mmt=$MAX_COMPRESSION_THREADS -ms=off -p"$PASSWD" -mhe=on "${DIR}.7z" "$DIR"
+
+    # Ursprünglichen Archivnamen (mit Leerzeichen) erzeugen
+    ORIG_ARCHIVE="${DIR}.7z"
+
+    # Sauberen Zielnamen erzeugen (ohne Leerzeichen)
+    ARCHIVE_NAME="${DIR// /}.7z"
+    ARCHIVE_BASENAME="${ARCHIVE_NAME%.7z}"
+
+    # Archiv erstellen (mit ursprünglichem Namen)
+    7z a -mx0 -mmt=$MAX_COMPRESSION_THREADS -ms=off -p"$PASSWD" -mhe=on "$ORIG_ARCHIVE" "$DIR"
+
+    # Archiv umbenennen
+    mv "$ORIG_ARCHIVE" "$ARCHIVE_NAME"
     
     # Speichere die tatsächliche Anzahl der Dokumente für spätere Verwendung
-    echo "$TOTAL_DOCS" > "${DIR}.count"
-    echo "$FILE_COUNT" > "${DIR}.actual_count"
+    echo "$TOTAL_DOCS" > "${ARCHIVE_BASENAME}.count"
+    echo "$FILE_COUNT" > "${ARCHIVE_BASENAME}.actual_count"
     
-    echo "${DIR}.7z" >> "$CLEANUP_FILE"
+    echo "$ARCHIVE_NAME" >> "$CLEANUP_FILE"
     echo "Archivierung von $DIR abgeschlossen"
     
     # Prüfe, ob alle Dokumente archiviert wurden
