@@ -707,7 +707,7 @@ class OptimizedHandler(http.server.SimpleHTTPRequestHandler):
         if args[0].startswith('2') or args[0].startswith('3'):
             status_code = int(args[0])
             if 200 <= status_code < 400:
-            return
+                return
         super().log_message(format, *args)
     
     def list_archives(self):
